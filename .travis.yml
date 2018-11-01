@@ -1,0 +1,27 @@
+sudo: false
+os: linux
+language: generic
+before_install:
+- mkdir -p ~/.local/bin
+- export PATH=$HOME/.local/bin:$PATH
+- travis_retry curl -L "https://github.com/tfausak/github-release/releases/download/1.2.2/github-release-linux.gz"
+  | zcat -d > $HOME/.local/bin/github-release
+- chmod +x $HOME/.local/bin/github-release
+install:
+- make
+before_deploy:
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then travis_retry curl -L "https://github.com/tfausak/github-release/releases/download/1.2.2/github-release-linux.gz"
+  | zcat -d > ~/.local/bin/github-release; chmod +x ~/.local/bin/github-release; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then travis_retry curl -L "https://github.com/tfausak/github-release/releases/download/1.2.2/github-release-osx.gz"
+  | zcat -d > ~/.local/bin/github-release; chmod +x ~/.local/bin/github-release; fi
+- env
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: github-release upload --token "${GITHUB_TOKEN}" --owner "jecxjo" --repo
+    "sandbox" --tag "${TRAVIS_TAG}" --file hello --name "hello-${TRAVIS_TAG}"
+  on:
+    branch: master
+env:
+  global:
+    secure: cnNEdIpZZJx6asSlTIJl94AhTroj38ltlXpHlp2l1Ya/2QyF2Q1Tarp4aWQGbbY1hb8kEVrH1/WP+fCC+InJ3cPXCyrjSXY4G/xrr3ileyJ2U7DfEgDzv4GoXyagcTNVB96KRoDxTZkvo3W68FHLybDeUmrMQdxUNutUVV2+1e48LsVaew11uaI7tNrlHGfy6Owe5ErFiIaCKYrso+wcfDmLpdFXs8UzqaSZPG6s6RYiib2r4rSmhg1a1rWrGbBzXNefFBCJSl4AePYgsC2AioYoOvEyYmAdCpJB1nFLmgPmVokAiRflhHqQHMSD2z1ZMtGHnAmEaeyGuvuGYP90LfmS5+VseUFhMWfD8X17K08xqm7ClhuPmSFQbFEomw9yf0RO9JwMnM50mBBYp786rwxYF+iOEhkty14ENCzukn/6Psc26cfssVKMCpQxE5DhKrx+FN+BAp1Osmq3NtuOsmTzimjf/kEMjxo1HnC7MKTyrTPaF7s8A5fjc6w4mCrOHSHKG04PFap2J99XYptXXBBJg8Z0ng04PNsX3bi2P17mE62cJNLEPu3Nvxtc0Dxv3cPva1AqeALTxhd8k3gAgiu+ACqNETvJvxYxwskAZEmT7BeaEWa8Z/LcKqYyUtnrt7fHVpzXb65UV+I0SQ7FLSEcBjeQWgeNCt5a1lquoTo=
